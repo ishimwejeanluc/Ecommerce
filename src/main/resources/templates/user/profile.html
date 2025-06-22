@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+    <title>User Profile</title>
+</head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <main class="container py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Profile Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="card bg-white p-6">
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <img th:if="${user.avatar}" 
+                                 th:src="${user.avatar}"
+                                 class="w-24 h-24 rounded-full object-cover"
+                                 alt="Profile Picture">
+                            <div th:unless="${user.avatar}"
+                                 class="w-24 h-24 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold"
+                                 th:text="${#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)}">
+                            </div>
+                            <button class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-50"
+                                    onclick="document.getElementById('avatarInput').click()">
+                                <i class="fas fa-camera text-gray-600"></i>
+                            </button>
+                            <input type="file" id="avatarInput" class="hidden" accept="image/*">
+                        </div>
+                        <h2 class="text-xl font-bold mt-4" th:text="${user.firstName + ' ' + user.lastName}">User Name</h2>
+                        <p class="text-gray-500" th:text="${user.email}">user@example.com</p>
+                    </div>
+                    
+                    <nav class="space-y-2">
+                        <a href="/profile" class="profile-nav-item active">
+                            <i class="fas fa-user mr-3"></i> Profile Information
+                        </a>
+                        <a href="/profile/orders" class="profile-nav-item">
+                            <i class="fas fa-shopping-bag mr-3"></i> My Orders
+                        </a>
+                        <a href="/profile/addresses" class="profile-nav-item">
+                            <i class="fas fa-map-marker-alt mr-3"></i> Addresses
+                        </a>
+                        <a href="/profile/wishlist" class="profile-nav-item">
+                            <i class="fas fa-heart mr-3"></i> Wishlist
+                        </a>
+                        <a href="/profile/settings" class="profile-nav-item">
+                            <i class="fas fa-cog mr-3"></i> Settings
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Profile Information -->
+                <div class="card bg-white p-6">
+                    <h3 class="text-xl font-bold mb-6">Profile Information</h3>
+                    <form id="profileForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-input" 
+                                       name="firstName" th:value="${user.firstName}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-input" 
+                                       name="lastName" th:value="${user.lastName}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" 
+                                       name="email" th:value="${user.email}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-input" 
+                                       name="phone" th:value="${user.phone}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Change Password -->
+                <div class="card bg-white p-6">
+                    <h3 class="text-xl font-bold mb-6">Change Password</h3>
+                    <form id="passwordForm" class="space-y-6">
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-input" 
+                                   name="currentPassword" required>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" 
+                                       name="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" 
+                                       name="confirmPassword" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Update Password
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Recent Orders -->
+                <div class="card bg-white p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">Recent Orders</h3>
+                        <a href="/profile/orders" class="text-primary hover:text-primary-dark">
+                            View All
+                        </a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left bg-gray-50">
+                                    <th class="p-4">Order ID</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Total</th>
+                                    <th class="p-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${recentOrders}" class="border-t">
+                                    <td class="p-4" th:text="${order.id}">123</td>
+                                    <td class="p-4" th:text="${#temporals.format(order.date, 'dd MMM yyyy')}">
+                                        01 Jan 2024
+                                    </td>
+                                    <td class="p-4">
+                                        <span th:class="${'status-badge status-' + order.status.toLowerCase()}"
+                                              th:text="${order.status}">Status</span>
+                                    </td>
+                                    <td class="p-4" th:text="${'$' + order.total}">$0.00</td>
+                                    <td class="p-4">
+                                        <a th:href="@{/profile/orders/{id}(id=${order.id})}"
+                                           class="text-primary hover:text-primary-dark">
+                                            View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <script th:src="@{/js/user/profile.js}"></script>
+</body>
+</html> 

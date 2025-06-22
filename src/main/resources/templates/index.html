@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"></head>
+<body class="flex flex-col min-h-screen">
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="container">
+                <div class="text-center">
+                    <h1 class="text-5xl font-bold mb-6">Discover Amazing Deals</h1>
+                    <p class="text-xl mb-8">Up to 70% off on selected items</p>
+                    <div class="flex justify-center gap-4">
+                        <a href="/shop" class="btn btn-light">Shop Now</a>
+                        <a href="/deals" class="btn btn-outline-light">Today's Deals</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Deals -->
+        <div class="container py-12">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold">Today's Best Deals</h2>
+                <a href="/deals" class="text-primary hover:underline">See all deals</a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Product Card 1 -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="https://via.placeholder.com/300" alt="Product" class="product-image">
+                        <span class="product-badge">SAVE 25%</span>
+                    </div>
+                    <div class="product-details">
+                        <div class="product-category">Electronics</div>
+                        <h3 class="product-title">Wireless Noise Cancelling Headphones</h3>
+                        <div class="product-price">
+                            $199.99
+                            <span class="deal-badge">Deal</span>
+                        </div>
+                        <div class="product-rating">
+                            <div class="rating-stars">
+                                ★★★★★
+                            </div>
+                            <span class="product-reviews">(2,345)</span>
+                        </div>
+                        <div class="prime-badge">
+                            <i class="fas fa-check"></i> Prime Delivery
+                        </div>
+                        <button class="btn btn-primary w-full mt-4">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Add more product cards with similar structure -->
+            </div>
+        </div>
+        
+        <!-- Categories Section -->
+        <div class="bg-gray-50 py-12">
+            <div class="container">
+                <h2 class="text-2xl font-bold mb-8">Shop by Category</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <a href="/category/electronics" class="category-card bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <img src="https://via.placeholder.com/150" alt="Electronics" class="w-full h-32 object-cover rounded mb-4">
+                        <h3 class="font-semibold text-center">Electronics</h3>
+                    </a>
+                    <!-- Add more category cards -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Products -->
+        <div class="container py-12">
+            <h2 class="text-2xl font-bold mb-8">Recommended for You</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <!-- Similar product cards as above, but smaller -->
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html> 

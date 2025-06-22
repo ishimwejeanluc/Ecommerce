@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"></head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <main class="container py-8">
+        <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+        
+        <!-- Empty Cart State -->
+        <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart text-center py-12">
+            <i class="fas fa-shopping-cart text-6xl text-secondary mb-4"></i>
+            <h2 class="text-2xl font-semibold mb-4">Your cart is empty</h2>
+            <p class="text-secondary mb-6">Add items to your cart to continue shopping</p>
+            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+        </div>
+        
+        <!-- Cart Items -->
+        <div th:if="${not #lists.isEmpty(cartItems)}" class="cart-content grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="cart-items lg:col-span-2">
+                <div th:each="item : ${cartItems}" class="cart-item card mb-4 p-4">
+                    <div class="flex items-center">
+                        <!-- Product Image -->
+                        <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}"
+                             class="w-24 h-24 object-cover rounded-lg">
+                             
+                        <!-- Product Details -->
+                        <div class="flex-1 ml-4">
+                            <h3 class="text-lg font-semibold" th:text="${item.product.name}">Product Name</h3>
+                            <p class="text-secondary" th:text="${item.product.category}">Category</p>
+                            <div class="flex items-center mt-2">
+                                <span th:if="${item.color}" class="text-sm mr-4">
+                                    Color: <span th:text="${item.color}">Color</span>
+                                </span>
+                                <span th:if="${item.size}" class="text-sm">
+                                    Size: <span th:text="${item.size}">Size</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Quantity Controls -->
+                        <div class="flex items-center space-x-2">
+                            <button class="btn" th:data-item-id="${item.id}" onclick="updateQuantity(this, -1)">-</button>
+                            <input type="number" th:value="${item.quantity}" min="1" 
+                                   class="form-input w-16 text-center"
+                                   th:data-item-id="${item.id}"
+                                   onchange="updateQuantity(this)">
+                            <button class="btn" th:data-item-id="${item.id}" onclick="updateQuantity(this, 1)">+</button>
+                        </div>
+                        
+                        <!-- Price and Remove -->
+                        <div class="ml-4 text-right">
+                            <p class="font-bold" th:text="${'$' + item.product.price * item.quantity}">$0.00</p>
+                            <button class="text-danger hover:text-danger-dark mt-2"
+                                    th:data-item-id="${item.id}"
+                                    onclick="removeItem(this)">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between">
+                            <span>Subtotal</span>
+                            <span th:text="${'$' + subtotal}">$0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping</span>
+                            <span th:text="${shipping > 0 ? '$' + shipping : 'Free'}">$0.00</span>
+                        </div>
+                        <div th:if="${tax > 0}" class="flex justify-between">
+                            <span>Tax</span>
+                            <span th:text="${'$' + tax}">$0.00</span>
+                        </div>
+                        <div class="border-t pt-3">
+                            <div class="flex justify-between font-bold">
+                                <span>Total</span>
+                                <span th:text="${'$' + total}">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="/checkout" class="btn btn-primary w-full">
+                        Proceed to Checkout
+                    </a>
+                </div>
+                
+                <!-- Promo Code -->
+                <div class="card p-6 mt-4">
+                    <h3 class="font-semibold mb-3">Promo Code</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" class="form-input flex-1" 
+                               placeholder="Enter promo code" id="promoCode">
+                        <button class="btn btn-primary" onclick="applyPromo()">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <script th:src="@{/js/cart.js}"></script>
+</body>
+</html> 

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+    <title>Product Management</title>
+</head>
+<body>
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar (same as dashboard) -->
+        <div th:replace="fragments/admin-sidebar :: sidebar"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow">
+                <div class="px-4 py-6 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Product Management</h2>
+                    <button class="btn btn-primary" onclick="openProductModal()">
+                        <i class="fas fa-plus mr-2"></i> Add Product
+                    </button>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Filters -->
+                <div class="card bg-white p-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-input" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}">Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-input" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sort By</label>
+                            <select class="form-input" id="sortBy">
+                                <option value="name">Name</option>
+                                <option value="price">Price</option>
+                                <option value="stock">Stock</option>
+                                <option value="created">Created Date</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-input" id="searchInput" 
+                                   placeholder="Search products...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="card bg-white overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left bg-gray-50">
+                                    <th class="p-4">Image</th>
+                                    <th class="p-4">Name</th>
+                                    <th class="p-4">Category</th>
+                                    <th class="p-4">Price</th>
+                                    <th class="p-4">Stock</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product : ${products}" class="border-t">
+                                    <td class="p-4">
+                                        <img th:src="${product.imageUrl}" 
+                                             th:alt="${product.name}"
+                                             class="w-12 h-12 object-cover rounded">
+                                    </td>
+                                    <td class="p-4" th:text="${product.name}">Product Name</td>
+                                    <td class="p-4" th:text="${product.category.name}">Category</td>
+                                    <td class="p-4" th:text="${'$' + product.price}">$0.00</td>
+                                    <td class="p-4" th:text="${product.stock}">0</td>
+                                    <td class="p-4">
+                                        <span th:class="${'status-badge status-' + product.status.toLowerCase()}"
+                                              th:text="${product.status}">Status</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary-dark"
+                                                    th:onclick="'editProduct(' + ${product.id} + ')'">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger-dark"
+                                                    th:onclick="'deleteProduct(' + ${product.id} + ')'">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="p-4 border-t">
+                        <div class="flex justify-between items-center">
+                            <p class="text-sm text-gray-500">
+                                Showing <span th:text="${page.firstItem}">1</span> to 
+                                <span th:text="${page.lastItem}">10</span> of 
+                                <span th:text="${page.totalItems}">100</span> products
+                            </p>
+                            <div class="flex space-x-2">
+                                <button th:if="${page.hasPrevious}"
+                                        class="btn"
+                                        th:onclick="'changePage(' + ${page.currentPage - 1} + ')'">
+                                    Previous
+                                </button>
+                                <button th:if="${page.hasNext}"
+                                        class="btn"
+                                        th:onclick="'changePage(' + ${page.currentPage + 1} + ')'">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="text-xl font-bold" id="modalTitle">Add Product</h3>
+                <button onclick="closeProductModal()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" class="space-y-4">
+                    <input type="hidden" id="productId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-input" id="productName" required>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-input" id="productCategory" required>
+                                <option value="">Select Category</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}">Category</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Price</label>
+                            <input type="number" class="form-input" id="productPrice" 
+                                   step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Stock</label>
+                            <input type="number" class="form-input" id="productStock" 
+                                   min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-input" id="productStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" id="productDescription" 
+                                  rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Images</label>
+                        <div class="dropzone" id="productImages">
+                            <div class="dz-message">
+                                Drop files here or click to upload
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeProductModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropzone.js -->
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css">
+    
+    <script th:src="@{/js/admin/products.js}"></script>
+</body>
+</html> 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-md">
+            <div class="p-4">
+                <h1 class="text-xl font-bold">Admin Panel</h1>
+            </div>
+            <nav class="mt-4">
+                <a href="/admin" class="flex items-center px-4 py-2 bg-primary text-white">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="/admin/products" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                    <i class="fas fa-box mr-3"></i>
+                    Products
+                </a>
+                <a href="/admin/orders" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                    <i class="fas fa-shopping-cart mr-3"></i>
+                    Orders
+                </a>
+                <a href="/admin/users" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                    <i class="fas fa-users mr-3"></i>
+                    Users
+                </a>
+                <a href="/admin/categories" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                    <i class="fas fa-tags mr-3"></i>
+                    Categories
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow">
+                <div class="px-4 py-6">
+                    <h2 class="text-2xl font-bold">Dashboard Overview</h2>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="card bg-white p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-primary bg-opacity-10">
+                                <i class="fas fa-shopping-cart text-primary text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-gray-500 text-sm">Total Orders</h3>
+                                <p class="text-2xl font-bold" th:text="${stats.totalOrders}">0</p>
+                                <p class="text-green-500 text-sm" th:text="${stats.orderGrowth + '%'}">+0%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-white p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-success bg-opacity-10">
+                                <i class="fas fa-dollar-sign text-success text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-gray-500 text-sm">Revenue</h3>
+                                <p class="text-2xl font-bold" th:text="${'$' + stats.totalRevenue}">$0</p>
+                                <p class="text-green-500 text-sm" th:text="${stats.revenueGrowth + '%'}">+0%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-white p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-warning bg-opacity-10">
+                                <i class="fas fa-users text-warning text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-gray-500 text-sm">Total Users</h3>
+                                <p class="text-2xl font-bold" th:text="${stats.totalUsers}">0</p>
+                                <p class="text-green-500 text-sm" th:text="${stats.userGrowth + '%'}">+0%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-white p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-danger bg-opacity-10">
+                                <i class="fas fa-box text-danger text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-gray-500 text-sm">Products</h3>
+                                <p class="text-2xl font-bold" th:text="${stats.totalProducts}">0</p>
+                                <p class="text-green-500 text-sm" th:text="${stats.productGrowth + '%'}">+0%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card bg-white p-6">
+                        <h3 class="text-lg font-semibold mb-4">Revenue Overview</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+
+                    <div class="card bg-white p-6">
+                        <h3 class="text-lg font-semibold mb-4">Orders Overview</h3>
+                        <canvas id="ordersChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="card bg-white p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Recent Orders</h3>
+                        <a href="/admin/orders" class="text-primary hover:text-primary-dark">View All</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left bg-gray-50">
+                                    <th class="p-4">Order ID</th>
+                                    <th class="p-4">Customer</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4">Amount</th>
+                                    <th class="p-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${recentOrders}" class="border-t">
+                                    <td class="p-4" th:text="${order.id}">123</td>
+                                    <td class="p-4" th:text="${order.customerName}">John Doe</td>
+                                    <td class="p-4">
+                                        <span th:class="${'status-badge status-' + order.status.toLowerCase()}"
+                                              th:text="${order.status}">Pending</span>
+                                    </td>
+                                    <td class="p-4" th:text="${#temporals.format(order.date, 'dd MMM yyyy')}">01 Jan 2024</td>
+                                    <td class="p-4" th:text="${'$' + order.amount}">$99.99</td>
+                                    <td class="p-4">
+                                        <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                                           class="text-primary hover:text-primary-dark">
+                                            View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/admin/dashboard.js}"></script>
+</body>
+</html> 

@@ -1,0 +1,19 @@
+<div th:fragment="product-card(product)" class="product-card card">
+    <div class="product-image relative">
+        <img th:src="${product.imageUrl}" th:alt="${product.name}" class="w-full h-48 object-cover rounded-t-lg">
+        <button class="wishlist-btn absolute top-2 right-2" th:data-product-id="${product.id}">
+            <i class="far fa-heart"></i>
+        </button>
+    </div>
+    
+    <div class="product-info p-4">
+        <h3 class="product-title text-lg font-semibold" th:text="${product.name}">Product Name</h3>
+        <p class="product-category text-sm text-secondary" th:text="${product.category}">Category</p>
+        <div class="flex justify-between items-center mt-2">
+            <span class="product-price font-bold" th:text="${'$' + product.price}">$0.00</span>
+            <button class="btn btn-primary add-to-cart" th:data-product-id="${product.id}">
+                Add to Cart
+            </button>
+        </div>
+    </div>
+</div> 

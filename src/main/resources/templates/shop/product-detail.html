@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"></head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <main class="container py-8">
+        <div class="product-detail grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Product Images -->
+            <div class="product-images">
+                <div class="main-image mb-4">
+                    <img th:src="${product.mainImage}" th:alt="${product.name}" 
+                         class="w-full h-96 object-cover rounded-lg">
+                </div>
+                <div class="image-gallery grid grid-cols-4 gap-2">
+                    <img th:each="image : ${product.images}" 
+                         th:src="${image}" 
+                         class="w-full h-24 object-cover rounded-lg cursor-pointer 
+                                hover:opacity-75 transition-opacity">
+                </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="product-info">
+                <h1 class="text-3xl font-bold mb-2" th:text="${product.name}">Product Name</h1>
+                <p class="text-secondary mb-4" th:text="${product.category}">Category</p>
+                
+                <div class="price-section mb-6">
+                    <span class="text-2xl font-bold" th:text="${'$' + product.price}">$0.00</span>
+                    <span th:if="${product.originalPrice}" 
+                          class="text-secondary line-through ml-2" 
+                          th:text="${'$' + product.originalPrice}">$0.00</span>
+                </div>
+                
+                <!-- Color Selection -->
+                <div class="color-selection mb-6" th:if="${not #lists.isEmpty(product.colors)}">
+                    <h3 class="text-lg font-semibold mb-2">Color</h3>
+                    <div class="flex space-x-2">
+                        <button th:each="color : ${product.colors}" 
+                                th:style="'background-color: ' + ${color.hex}"
+                                class="w-8 h-8 rounded-full border-2 border-transparent 
+                                       hover:border-primary focus:border-primary">
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Size Selection -->
+                <div class="size-selection mb-6" th:if="${not #lists.isEmpty(product.sizes)}">
+                    <h3 class="text-lg font-semibold mb-2">Size</h3>
+                    <div class="flex space-x-2">
+                        <button th:each="size : ${product.sizes}" 
+                                th:text="${size}"
+                                class="px-4 py-2 border rounded-md hover:border-primary 
+                                       focus:border-primary">
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quantity -->
+                <div class="quantity-section mb-6">
+                    <h3 class="text-lg font-semibold mb-2">Quantity</h3>
+                    <div class="flex items-center space-x-2">
+                        <button class="btn" id="decreaseQuantity">-</button>
+                        <input type="number" value="1" min="1" 
+                               class="form-input w-20 text-center" id="quantity">
+                        <button class="btn" id="increaseQuantity">+</button>
+                    </div>
+                </div>
+                
+                <!-- Add to Cart -->
+                <div class="actions flex space-x-4 mb-8">
+                    <button class="btn btn-primary flex-1" id="addToCart">
+                        Add to Cart
+                    </button>
+                    <button class="btn wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                
+                <!-- Product Description -->
+                <div class="description mb-8">
+                    <h3 class="text-lg font-semibold mb-2">Description</h3>
+                    <div class="prose" th:utext="${product.description}">
+                        Product description here...
+                    </div>
+                </div>
+                
+                <!-- Product Features -->
+                <div class="features mb-8">
+                    <h3 class="text-lg font-semibold mb-2">Features</h3>
+                    <ul class="list-disc pl-5">
+                        <li th:each="feature : ${product.features}" 
+                            th:text="${feature}">Feature</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Products -->
+        <div class="related-products mt-12">
+            <h2 class="text-2xl font-bold mb-6">You May Also Like</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div th:each="related : ${relatedProducts}" th:remove="tag">
+                    <div th:replace="fragments/product-card :: product-card(${related})"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Product Detail Specific JS -->
+    <script th:src="@{/js/product-detail.js}"></script>
+</body>
+</html> 

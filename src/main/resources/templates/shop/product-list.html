@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"></head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <main class="container py-8">
+        <!-- Filters Section -->
+        <div class="filters-section mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Category Filter -->
+                <div class="filter-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option th:each="category : ${categories}" 
+                                th:value="${category.id}" 
+                                th:text="${category.name}">Category</option>
+                    </select>
+                </div>
+                
+                <!-- Price Range -->
+                <div class="filter-group">
+                    <label class="form-label">Price Range</label>
+                    <div class="flex space-x-2">
+                        <input type="number" class="form-input" placeholder="Min" id="minPrice">
+                        <input type="number" class="form-input" placeholder="Max" id="maxPrice">
+                    </div>
+                </div>
+                
+                <!-- Sort By -->
+                <div class="filter-group">
+                    <label class="form-label">Sort By</label>
+                    <select class="form-input" id="sortBy">
+                        <option value="newest">Newest</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+                
+                <!-- Search -->
+                <div class="filter-group">
+                    <label class="form-label">Search</label>
+                    <input type="text" class="form-input" placeholder="Search products..." id="searchInput">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Filters -->
+        <div class="active-filters mb-4 flex flex-wrap gap-2" id="activeFilters">
+            <!-- Active filters will be inserted here via JavaScript -->
+        </div>
+        
+        <!-- Products Grid -->
+        <div class="products-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div th:each="product : ${products}" th:remove="tag">
+                <div th:replace="fragments/product-card :: product-card(${product})"></div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination flex justify-center items-center space-x-2 mt-8">
+            <a th:if="${currentPage > 1}" 
+               th:href="@{/shop(page=${currentPage - 1})}" 
+               class="btn btn-primary">Previous</a>
+               
+            <span th:each="pageNum : ${#numbers.sequence(1, totalPages)}">
+                <a th:href="@{/shop(page=${pageNum})}" 
+                   th:text="${pageNum}"
+                   th:class="${pageNum == currentPage ? 'btn btn-primary' : 'btn'}">1</a>
+            </span>
+            
+            <a th:if="${currentPage < totalPages}" 
+               th:href="@{/shop(page=${currentPage + 1})}" 
+               class="btn btn-primary">Next</a>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Product List Specific JS -->
+    <script th:src="@{/js/product-list.js}"></script>
+</body>
+</html> 
